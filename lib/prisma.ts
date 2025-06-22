@@ -1,5 +1,6 @@
-// Importation du client Prisma de la manière la plus simple possible
-import * as prisma from '@prisma/client';
+// Importation directe du client Prisma généré
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { PrismaClient } = require('.prisma/client/default');
 
 // Définition du type global pour éviter les connexions multiples
 declare global {
@@ -11,11 +12,14 @@ declare global {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let client: any;
 
+// Initialisation du client Prisma en fonction de l'environnement
 if (process.env.NODE_ENV === 'production') {
-  client = new prisma.PrismaClient();
+  // En production, créer une nouvelle instance
+  client = new PrismaClient();
 } else {
+  // En développement, réutiliser l'instance existante si disponible
   if (!global.prismaClient) {
-    global.prismaClient = new prisma.PrismaClient();
+    global.prismaClient = new PrismaClient();
   }
   client = global.prismaClient;
 }
