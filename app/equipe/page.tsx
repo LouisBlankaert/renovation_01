@@ -59,7 +59,7 @@ export default function TeamPage() {
                 Notre équipe
               </h2>
               <p className="mt-4 text-lg leading-8 text-gray-600">
-                Une équipe pluridisciplinaire de professionnels passionnés par l'architecture d'intérieur et le design.
+                Une équipe pluridisciplinaire de professionnels passionnés par l&apos;architecture d&apos;intérieur et le design.
               </p>
             </div>
             <ul
