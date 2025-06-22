@@ -1,6 +1,6 @@
-// Importation directe du client Prisma généré
+// Importation standard du client Prisma
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { PrismaClient } = require('.prisma/client/default');
+const { PrismaClient } = require('@prisma/client');
 
 // Définition du type global pour éviter les connexions multiples
 declare global {
