@@ -21,30 +21,48 @@ const APPOINTMENT_DURATION = 60;
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const date = url.searchParams.get('date');
+    const dateParam = url.searchParams.get('date');
     
-    if (!date) {
+    if (!dateParam) {
       return NextResponse.json(
         { error: 'Date requise' },
         { status: 400 }
       );
     }
     
+    console.log('Date paramètre reçue:', dateParam);
+    
     // Formatage de la date pour la requête Prisma
-    const searchDate = new Date(date);
-    // S'assurer que la date est valide
-    if (isNaN(searchDate.getTime())) {
+    // Extraire année, mois, jour de la date (format YYYY-MM-DD)
+    const [year, month, day] = dateParam.split('-').map(Number);
+    
+    // Vérifier que les composants de la date sont valides
+    if (!year || !month || !day || isNaN(year) || isNaN(month) || isNaN(day)) {
+      console.log('Format de date invalide:', { year, month, day });
       return NextResponse.json(
-        { error: 'Format de date invalide' },
+        { error: 'Format de date invalide. Utilisez YYYY-MM-DD.' },
         { status: 400 }
       );
     }
     
+    // Créer une date UTC pour éviter les problèmes de fuseau horaire
+    const searchDate = new Date(Date.UTC(year, month - 1, day));
+    console.log('Date de recherche:', searchDate.toISOString());
+    
+    // Créer les dates de début et de fin pour la requête
+    const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+    const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59));
+    
+    console.log('Début de journée:', startOfDay.toISOString());
+    console.log('Fin de journée:', endOfDay.toISOString());
+    
     // Récupérer les réservations existantes pour cette date
+    // Utiliser une plage de dates pour éviter les problèmes de fuseau horaire
     const existingBookings = await prisma.callBooking.findMany({
       where: {
         date: {
-          equals: searchDate
+          gte: startOfDay,
+          lte: endOfDay
         },
         status: {
           in: ['pending', 'confirmed'] // Ne pas prendre en compte les annulés ou terminés
@@ -55,20 +73,29 @@ export async function GET(request: NextRequest) {
       }
     });
     
+    console.log('Réservations trouvées:', existingBookings.length);
+    
     // Extraire les heures déjà réservées
     const bookedTimes = existingBookings.map((booking: { time: string }) => booking.time);
+    console.log('Heures réservées:', bookedTimes);
     
     // Calculer les créneaux disponibles
     const availableSlots = calculateAvailableSlots(bookedTimes);
+    console.log('Créneaux disponibles:', availableSlots);
     
     return NextResponse.json({
-      date,
+      date: dateParam,
       availableSlots
     });
   } catch (error) {
     console.error('Error fetching available slots:', error);
+    // Ajouter plus de détails sur l'erreur
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+    const errorStack = error instanceof Error ? error.stack : 'Pas de stack trace';
+    console.error('Détails de l\'erreur:', { message: errorMessage, stack: errorStack });
+    
     return NextResponse.json(
-      { error: 'Erreur lors de la récupération des créneaux disponibles' },
+      { error: 'Erreur lors de la récupération des créneaux disponibles', details: errorMessage },
       { status: 500 }
     );
   }
