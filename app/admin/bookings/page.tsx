@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
-import { useRouter } from "next/navigation";
 
 // Clé d'API pour l'authentification (récupérée depuis les variables d'environnement)
 // Nous utilisons une valeur par défaut au cas où la variable d'environnement n'est pas définie
@@ -31,7 +30,6 @@ export default function AdminBookingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
-  const router = useRouter();
 
   // Mot de passe d'administration - Récupéré depuis les variables d'environnement
   const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "renovation2025";

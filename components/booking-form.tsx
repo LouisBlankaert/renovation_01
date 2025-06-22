@@ -127,9 +127,11 @@ export default function BookingForm() {
       setTimeout(() => {
         setFormSubmitted(false);
       }, 5000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Erreur lors de la réservation:', err);
-      setError(err.message || 'Une erreur est survenue. Veuillez réessayer plus tard.');
+      setError(
+        err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer plus tard.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -268,7 +270,9 @@ export default function BookingForm() {
               </select>
             ) : (
               <div className="mt-1">
-                <p className="text-sm text-red-600">Aucun créneau disponible à cette date. Veuillez sélectionner une autre date.</p>
+                <p className="text-sm text-red-600 mt-2">
+                  Aucun créneau n&apos;est disponible pour cette date. Veuillez sélectionner une autre date.
+                </p>
                 <select
                   name="time"
                   id="time"
@@ -281,14 +285,16 @@ export default function BookingForm() {
             )
           ) : (
             <div className="mt-1">
-              <p className="text-sm text-gray-500">Veuillez d'abord sélectionner une date</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Sélectionnez d&apos;abord une date pour voir les créneaux disponibles.
+              </p>
               <select
                 name="time"
                 id="time"
                 disabled
                 className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
               >
-                <option value="">Sélectionnez d'abord une date</option>
+                <option value="">Sélectionnez d&apos;abord une date</option>
               </select>
             </div>
           )}
