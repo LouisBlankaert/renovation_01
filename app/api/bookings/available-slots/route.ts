@@ -30,10 +30,22 @@ export async function GET(request: NextRequest) {
       );
     }
     
+    // Formatage de la date pour la requête Prisma
+    const searchDate = new Date(date);
+    // S'assurer que la date est valide
+    if (isNaN(searchDate.getTime())) {
+      return NextResponse.json(
+        { error: 'Format de date invalide' },
+        { status: 400 }
+      );
+    }
+    
     // Récupérer les réservations existantes pour cette date
     const existingBookings = await prisma.callBooking.findMany({
       where: {
-        date: new Date(date),
+        date: {
+          equals: searchDate
+        },
         status: {
           in: ['pending', 'confirmed'] // Ne pas prendre en compte les annulés ou terminés
         }
