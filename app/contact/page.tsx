@@ -6,6 +6,11 @@ import { useState } from "react";
 import Image from "next/image";
 
 export default function Contact() {
+  // Récupérer les paramètres d'URL pour voir si on vient du CTA de réservation d'appel
+  const isClient = typeof window !== 'undefined';
+  const urlParams = isClient ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const serviceParam = urlParams.get('service');
+  const isCallBooking = serviceParam === 'appel-consultation';
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -13,6 +18,9 @@ export default function Contact() {
     phone: "",
     message: "",
     projectType: "",
+    callPreference: "",
+    preferredDate: "",
+    preferredTime: "",
   });
 
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -25,26 +33,76 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Ici, vous pourriez ajouter la logique pour envoyer le formulaire à un backend
-    console.log("Formulaire soumis:", formData);
-    setFormSubmitted(true);
+    setIsSubmitting(true);
+    setError(null);
     
-    // Réinitialiser le formulaire après soumission
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      message: "",
-      projectType: "",
-    });
-    
-    // Réinitialiser l'état après 5 secondes
-    setTimeout(() => {
-      setFormSubmitted(false);
-    }, 5000);
+    try {
+      // Déterminer quel endpoint utiliser en fonction du type de formulaire
+      const endpoint = isCallBooking ? '/api/bookings' : '/api/contact';
+      
+      // Préparer les données à envoyer
+      const dataToSend = isCallBooking 
+        ? {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            date: formData.preferredDate,
+            time: formData.preferredTime,
+            callType: formData.callPreference,
+            message: formData.message
+          }
+        : {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            message: formData.message,
+            projectType: formData.projectType
+          };
+      
+      // Envoyer les données à l'API
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Une erreur est survenue lors de l\'envoi du formulaire.');
+      }
+      
+      // Réinitialiser le formulaire après soumission réussie
+      setFormSubmitted(true);
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        message: "",
+        projectType: "",
+        callPreference: "",
+        preferredDate: "",
+        preferredTime: "",
+      });
+      
+      // Réinitialiser l'état après 5 secondes
+      setTimeout(() => {
+        setFormSubmitted(false);
+      }, 5000);
+    } catch (err) {
+      console.error('Erreur lors de la soumission du formulaire:', err);
+      setError('Une erreur est survenue. Veuillez réessayer plus tard.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -54,9 +112,13 @@ export default function Contact() {
         <div className="bg-white py-24 sm:py-32">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl font-playfair">Contactez-nous</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl font-playfair">
+                {isCallBooking ? "Réservez votre appel de consultation" : "Contactez-nous"}
+              </h1>
               <p className="mt-4 text-lg leading-8 text-gray-600">
-                Vous avez un projet de rénovation ou d&apos;aménagement ? N&apos;hésitez pas à nous contacter pour en discuter.
+                {isCallBooking 
+                  ? "Choisissez un créneau qui vous convient pour discuter de votre projet avec l'un de nos experts." 
+                  : "Vous avez un projet de rénovation ou d'aménagement ? N'hésitez pas à nous contacter pour en discuter."}
               </p>
             </div>
             
@@ -209,11 +271,12 @@ export default function Contact() {
                           <select
                             id="projectType"
                             name="projectType"
-                            value={formData.projectType}
+                            value={isCallBooking && !formData.projectType ? "consultation" : formData.projectType}
                             onChange={handleChange}
                             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
                           >
                             <option value="">Sélectionnez un type de projet</option>
+                            <option value="consultation" selected={isCallBooking}>Consultation / Appel avec un expert</option>
                             <option value="renovation">Rénovation complète</option>
                             <option value="decoration">Décoration d&apos;intérieur</option>
                             <option value="architecture">Architecture</option>
@@ -223,9 +286,76 @@ export default function Contact() {
                           </select>
                         </div>
                       </div>
+                      {isCallBooking && (
+                        <>
+                          <div className="sm:col-span-2">
+                            <label htmlFor="callPreference" className="block text-sm font-medium text-gray-700">
+                              Préférence d&apos;appel
+                            </label>
+                            <div className="mt-1">
+                              <select
+                                id="callPreference"
+                                name="callPreference"
+                                value={formData.callPreference}
+                                onChange={handleChange}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                                required={isCallBooking}
+                              >
+                                <option value="">Choisissez votre préférence</option>
+                                <option value="phone">Appel téléphonique</option>
+                                <option value="video">Visioconférence</option>
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <label htmlFor="preferredDate" className="block text-sm font-medium text-gray-700">
+                              Date souhaitée
+                            </label>
+                            <div className="mt-1">
+                              <input
+                                type="date"
+                                name="preferredDate"
+                                id="preferredDate"
+                                value={formData.preferredDate}
+                                onChange={handleChange}
+                                required={isCallBooking}
+                                min={new Date().toISOString().split('T')[0]}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <label htmlFor="preferredTime" className="block text-sm font-medium text-gray-700">
+                              Heure souhaitée
+                            </label>
+                            <div className="mt-1">
+                              <select
+                                id="preferredTime"
+                                name="preferredTime"
+                                value={formData.preferredTime}
+                                onChange={handleChange}
+                                required={isCallBooking}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                              >
+                                <option value="">Choisissez un créneau horaire</option>
+                                <option value="9h00-10h00">9h00 - 10h00</option>
+                                <option value="10h00-11h00">10h00 - 11h00</option>
+                                <option value="11h00-12h00">11h00 - 12h00</option>
+                                <option value="14h00-15h00">14h00 - 15h00</option>
+                                <option value="15h00-16h00">15h00 - 16h00</option>
+                                <option value="16h00-17h00">16h00 - 17h00</option>
+                                <option value="17h00-18h00">17h00 - 18h00</option>
+                              </select>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      
                       <div className="sm:col-span-2">
                         <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-                          Message
+                          {isCallBooking ? "Sujet de la consultation" : "Message"}
                         </label>
                         <div className="mt-1">
                           <textarea
@@ -236,7 +366,7 @@ export default function Contact() {
                             onChange={handleChange}
                             required
                             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
-                            placeholder="Décrivez votre projet, vos besoins et vos attentes..."
+                            placeholder={isCallBooking ? "Décrivez brièvement le sujet que vous souhaitez aborder lors de l'appel..." : "Décrivez votre projet, vos besoins et vos attentes..."}
                           />
                         </div>
                       </div>
@@ -246,7 +376,7 @@ export default function Contact() {
                         type="submit"
                         className="w-full rounded-md bg-green-800 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus-visible:outline-offset-2 focus-visible:outline-2 focus-visible:outline-green-600"
                       >
-                        Envoyer
+                        {isCallBooking ? "Réserver mon appel" : "Envoyer"}
                       </button>
                     </div>
                   </form>

@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modèle pour les projets de rénovation/architecture
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String
+  category    String
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  slug        String   @unique
+  beforeImage String?
+  afterImage  String?
+  location    String?
+  client      String?
+  year        Int?
+  details     String?
+}
+
+// Modèle pour les services proposés
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String
+  features    String   // Stocké sous forme de JSON stringifié
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  slug        String   @unique
+  price       String?
+  duration    String?
+}
+
+// Modèle pour les témoignages clients
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String?
+  company   String?
+  content   String
+  imageUrl  String?
+  rating    Int      @default(5) // Note sur 5
+  createdAt DateTime @default(now())
+  featured  Boolean  @default(false)
+}
+
+// Modèle pour les réservations d'appel
+model CallBooking {
+  id             String   @id @default(cuid())
+  firstName      String
+  lastName       String
+  email          String
+  phone          String?
+  date           DateTime
+  time           String
+  callType       String   // "phone" ou "video"
+  message        String?
+  status         String   @default("pending") // pending, confirmed, completed, cancelled
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Modèle pour les messages de contact
+model ContactMessage {
+  id         String   @id @default(cuid())
+  firstName  String
+  lastName   String
+  email      String
+  phone      String?
+  message    String
+  projectType String?
+  createdAt  DateTime @default(now())
+  read       Boolean  @default(false)
+  responded  Boolean  @default(false)
+}
+
+// Modèle pour l'équipe
+model TeamMember {
+  id       String @id @default(cuid())
+  name     String
+  role     String
+  bio      String
+  imageUrl String
+  order    Int    @default(0)
+  email    String?
+  phone    String?
+  linkedin String?
+}
+
+// Modèle pour les paramètres du site
+model SiteSettings {
+  id              String @id @default("settings")
+  siteName        String @default("Créateurs d'intérieur")
+  siteDescription String @default("Architecture d'intérieur et décoration")
+  email           String @default("info@createurs-interieur.be")
+  phone           String @default("+32 2 123 45 67")
+  address         String @default("123 Rue de la Rénovation, 1000 Bruxelles, Belgique")
+  facebook        String?
+  instagram       String?
+  linkedin        String?
+  pinterest       String?
+}

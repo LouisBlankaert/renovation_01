@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
+import { CallBookingCTA } from "@/components/ui/call-booking-cta";
 
 const services = [
   {
@@ -210,6 +211,7 @@ export default function ServicesPage() {
             </div>
           </div>
         </div>
+        <CallBookingCTA />
       </main>
       <Footer />
     </>

@@ -5,6 +5,7 @@ import { Testimonials } from "@/components/ui/testimonials";
 import { ContactSection } from "@/components/ui/contact-section";
 import { Header } from "@/components/ui/header";
 import { Footer } from "@/components/ui/footer";
+import { CallBookingCTA } from "@/components/ui/call-booking-cta";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         <Services />
         <Projects />
         <Testimonials />
+        <CallBookingCTA />
         <ContactSection />
       </main>
       <Footer />
