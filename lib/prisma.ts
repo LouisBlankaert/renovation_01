@@ -1,13 +1,15 @@
-import * as prismaClient from '@prisma/client';
+// Importation du client Prisma pour la version 6.x
+import { PrismaClient } from '@prisma/client';
 
-// PrismaClient est attaché à l'objet global en développement pour éviter
-// d'épuiser la limite de connexions à la base de données pendant le hot-reloading
+// Déclaration pour le singleton global
 declare global {
-  var prisma: typeof prismaClient | undefined;
+  var prisma: PrismaClient | undefined;
 }
 
-const prisma = global.prisma || prismaClient;
+// Initialisation du client Prisma
+const prisma = global.prisma || new PrismaClient();
 
+// Sauvegarde de l'instance en développement pour éviter les connexions multiples
 if (process.env.NODE_ENV !== 'production') {
   global.prisma = prisma;
 }
