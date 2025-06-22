@@ -1,16 +1,14 @@
-// Importation standard du client Prisma
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { PrismaClient } = require('@prisma/client');
+// Importation standard du client Prisma avec ESM
+import { PrismaClient } from '@prisma/client';
 
 // Définition du type global pour éviter les connexions multiples
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  var prismaClient: any | undefined;
+  var prismaClient: PrismaClient | undefined;
 }
 
 // Création d'une instance unique du client
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let client: any;
+let client: PrismaClient;
 
 // Initialisation du client Prisma en fonction de l'environnement
 if (process.env.NODE_ENV === 'production') {
