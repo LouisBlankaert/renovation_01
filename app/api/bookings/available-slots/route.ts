@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     });
     
     // Extraire les heures déjà réservées
-    const bookedTimes = existingBookings.map(booking => booking.time);
+    const bookedTimes = existingBookings.map((booking: { time: string }) => booking.time);
     
     // Calculer les créneaux disponibles
     const availableSlots = calculateAvailableSlots(bookedTimes);
