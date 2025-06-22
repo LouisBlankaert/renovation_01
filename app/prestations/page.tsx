@@ -96,8 +96,8 @@ export default function ServicesPage() {
                 Nos prestations
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-600">
-                Découvrez l'ensemble des services que nous proposons pour transformer vos espaces
-                et concrétiser vos projets d'architecture et de décoration.
+                Découvrez l&apos;ensemble des services que nous proposons pour transformer vos espaces
+                et concrétiser vos projets d&apos;architecture et de décoration.
               </p>
             </div>
 
@@ -202,8 +202,8 @@ export default function ServicesPage() {
                   </div>
                   <h3 className="mt-4 text-lg font-semibold leading-8 text-gray-900">Réalisation et suivi</h3>
                   <p className="mt-2 text-base leading-7 text-gray-600">
-                    Nous coordonnons les différents intervenants et assurons le suivi du chantier jusqu'à la livraison finale,
-                    en veillant au respect des délais et de la qualité d'exécution.
+                    Nous coordonnons les différents intervenants et assurons le suivi du chantier jusqu&apos;à la livraison finale,
+                    en veillant au respect des délais et de la qualité d&apos;exécution.
                   </p>
                 </div>
               </div>

@@ -67,7 +67,7 @@ export function Testimonials() {
                   ))}
                 </div>
                 <div className="mt-6 text-lg leading-7 text-gray-700">
-                  <p>"{testimonial.content}"</p>
+                  <p>&quot;{testimonial.content}&quot;</p>
                 </div>
               </div>
               <div className="mt-8 flex items-center gap-x-4">

@@ -93,7 +93,7 @@ export default function PricingPage() {
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-600">
                 Nous proposons différentes formules adaptées à vos besoins et à votre budget.
-                Chaque projet étant unique, n'hésitez pas à nous contacter pour un devis personnalisé.
+                Chaque projet étant unique, n&apos;hésitez pas à nous contacter pour un devis personnalisé.
               </p>
             </div>
             <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-3">
