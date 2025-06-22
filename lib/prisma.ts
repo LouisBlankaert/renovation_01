@@ -1,21 +1,26 @@
 import { PrismaClient } from '@prisma/client';
-import { withAccelerate } from '@prisma/extension-accelerate';
-
-// Type personnalisé pour le client Prisma avec Accelerate
-type PrismaClientWithAccelerate = ReturnType<typeof getPrismaClient>;
 
 // Déclaration globale pour le singleton
 declare global {
-  var prismaClient: PrismaClientWithAccelerate | undefined;
+  var prismaClient: any;
 }
 
-// Fonction pour créer un client Prisma avec Accelerate
-function getPrismaClient() {
-  return new PrismaClient().$extends(withAccelerate());
+// Fonction pour créer un client Prisma
+// Essaie d'utiliser Accelerate si disponible, sinon utilise le client standard
+function getPrismaClient(): PrismaClient {
+  try {
+    // Import dynamique pour éviter les erreurs si le module n'est pas disponible
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { withAccelerate } = require('@prisma/extension-accelerate');
+    return new PrismaClient().$extends(withAccelerate()) as unknown as PrismaClient;
+  } catch (error) {
+    console.log('Prisma Accelerate non disponible, utilisation du client standard');
+    return new PrismaClient();
+  }
 }
 
 // Initialisation du client Prisma en fonction de l'environnement
-let client: PrismaClientWithAccelerate;
+let client: PrismaClient;
 
 if (process.env.NODE_ENV === 'production') {
   // En production, créer une nouvelle instance
