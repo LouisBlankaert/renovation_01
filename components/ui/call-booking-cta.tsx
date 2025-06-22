@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+// Composant CTA pour la réservation d'appel
 export function CallBookingCTA() {
   return (
     <div className="bg-green-50 py-16">
