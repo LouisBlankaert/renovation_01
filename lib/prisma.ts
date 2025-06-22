@@ -3,10 +3,12 @@ import * as prisma from '@prisma/client';
 
 // Définition du type global pour éviter les connexions multiples
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   var prismaClient: any | undefined;
 }
 
 // Création d'une instance unique du client
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let client: any;
 
 if (process.env.NODE_ENV === 'production') {
